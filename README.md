@@ -1,43 +1,22 @@
 # Router - Traefik Configuration
 
-This repository contains the Traefik reverse proxy configuration for the create-profile application stack.
+This repository contains the Traefik reverse proxy configuration.
 
 ## Current Route Mappings
 
 ### Port Configuration
 - **Port 80**: HTTP traffic (redirected to HTTPS in production)
 - **Port 443**: HTTPS traffic
-- **Port 8080**: Traefik dashboard (admin:password)
+- **Port 8000**: Traefik dashboard (admin:password)
 
 ### Service Routes
 
-| Route Path | Service | Container | Port | Priority | Description |
+| Client | Service | Container | Port | Description |
 |------------|---------|-----------|------|----------|-------------|
-| `/` | Frontend | `fresh-frontend` | 8000 | 1 | Main frontend application (catch-all) |
-| `/admin` | Backend (Strapi) | `strapi-backend` | 1337 | 10 | Strapi admin interface |
-| `/forum` | Forum (NodeBB) | `nodebb-forum` | 4567 | 5 | Forum application |
-
-
-### Priority Explanation
-- Higher priority numbers are matched first
-- `/admin` (priority 10) matches before `/` (priority 1)
-- `/forum` (priority 5) matches before `/` (priority 1)
-- `/` (priority 1) acts as a catch-all for all other routes
-
-## Configuration Files
-
-- `traefik.yml`: Main Traefik configuration
-- `dynamic/routes.yml`: Dynamic routing configuration
-- `docker-compose.yml`: Docker compose for standalone Traefik
-- `Dockerfile`: Custom Traefik image with embedded config
-
-## Dashboard Access
-
-The Traefik dashboard is available at:
-- URL: `http://traefik.localhost:8080` (when using traefik.localhost as host)
-- URL: `http://localhost:8080` (when using localhost)
-- Username: `admin`
-- Password: `password`
+| - | Traefik | `traefik` | 8000 | Traefik dashboard | 
+| Alumbra | Deno Fresh | `fresh-frontend` | 8001 | Frontend application |
+| Alumbra | Strapi | `strapi-backend` | 8002 | Strapi admin interface |
+| Alumbra | NodeBB | `nodebb-forum` | 8003 | Forum platform |
 
 ## Network Configuration
 
@@ -99,28 +78,3 @@ services:
 ## SSL/TLS Configuration
 
 The configuration includes Let's Encrypt integration for automatic SSL certificates in production. Update the email in `traefik.yml` for certificate notifications.
-
-## Usage
-
-### Option 1: Use the main project's start script (Recommended)
-The main project's `start.sh` script will automatically handle starting Traefik when needed:
-```bash
-cd ..  # Go to main project root
-./start.sh
-```
-
-### Option 2: Start Traefik manually
-To start only the Traefik router:
-```bash
-# Create the shared network first (if it doesn't exist)
-docker network create web
-
-# Start Traefik
-docker-compose up -d
-```
-
-The services will be available at:
-- Frontend: http://localhost/
-- Strapi Admin: http://localhost/admin
-- Forum: http://localhost/forum
-- Traefik Dashboard: http://localhost:8080
