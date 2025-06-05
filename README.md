@@ -40,10 +40,13 @@ The Traefik dashboard is available at:
 
 ## Network Configuration
 
-All services use the `web` external network for Traefik routing:
+All services use the external `web` network for Traefik routing. This network must be created before starting the services:
+
 ```bash
 docker network create web
 ```
+
+This allows multiple docker-compose stacks to share the same network and communicate with Traefik.
 
 ## Adding New Services
 
@@ -69,6 +72,29 @@ networks:
 
 3. Update this README with the new route mapping
 
+## Adding New Docker Compose Stacks
+
+To add a completely separate docker-compose stack that also uses Traefik routing:
+
+1. In your new `docker-compose.yml`, reference the external web network:
+```yaml
+networks:
+  web:
+    external: true
+
+services:
+  your-service:
+    # ... your service configuration
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.your-service.rule=Host(`localhost`) && PathPrefix(`/your-path`)"
+      # ... other Traefik labels
+```
+
+2. The `web` network will already exist and your service will automatically be routed through the same Traefik instance
+
 ## SSL/TLS Configuration
 
 The configuration includes Let's Encrypt integration for automatic SSL certificates in production. Update the email in `traefik.yml` for certificate notifications.
@@ -77,7 +103,10 @@ The configuration includes Let's Encrypt integration for automatic SSL certifica
 
 To start the router with the main application:
 ```bash
+# Create the shared network first
 docker network create web
+
+# Start the services
 docker-compose up -d
 ```
 
