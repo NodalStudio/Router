@@ -102,12 +102,20 @@ The configuration includes Let's Encrypt integration for automatic SSL certifica
 
 ## Usage
 
-To start the router with the main application:
+### Option 1: Use the main project's start script (Recommended)
+The main project's `start.sh` script will automatically handle starting Traefik when needed:
 ```bash
-# Create the shared network first
+cd ..  # Go to main project root
+./start.sh
+```
+
+### Option 2: Start Traefik manually
+To start only the Traefik router:
+```bash
+# Create the shared network first (if it doesn't exist)
 docker network create web
 
-# Start the services
+# Start Traefik
 docker-compose up -d
 ```
 
