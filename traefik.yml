@@ -12,9 +12,6 @@ providers:
   docker:
     exposedByDefault: false
     network: web
-  file:
-    directory: /etc/traefik/dynamic
-    watch: true
 
 certificatesResolvers:
   letsencrypt:

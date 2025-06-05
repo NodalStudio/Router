@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   traefik:
     image: traefik:v3.0
@@ -8,7 +6,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"  # Traefik dashboard
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
@@ -21,7 +19,7 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$10$$rO7VWlFdvaj0/qE4qF4eT.UuKeVeJOkKvbUnGD5GVzp5Gb4d2H0dq" # admin:password
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$C6mSfRNr2EXtOzVphZqKL.PXp6WY7WSO.mX9Z2VXt0qogSTvZSB0a"
 
 networks:
   web:
