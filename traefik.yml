@@ -16,7 +16,7 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: your-email@example.com
+      email: ${TRAEFIK_SSL_EMAIL}
       storage: /ssl-certs/acme.json
       httpChallenge:
         entryPoint: web
@@ -26,6 +26,6 @@ global:
   sendAnonymousUsage: false
 
 log:
-  level: INFO
+  level: ${TRAEFIK_LOG_LEVEL}
 
 accessLog: {}
