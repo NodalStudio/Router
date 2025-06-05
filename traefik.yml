@@ -7,8 +7,6 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
-  dashboard:
-    address: ":8000"
 
 providers:
   docker:
@@ -18,7 +16,7 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: ${TRAEFIK_SSL_EMAIL}
+      email: example@example.com
       storage: /ssl-certs/acme.json
       httpChallenge:
         entryPoint: web
@@ -28,6 +26,6 @@ global:
   sendAnonymousUsage: false
 
 log:
-  level: ${TRAEFIK_LOG_LEVEL}
+  level: INFO
 
 accessLog: {}
