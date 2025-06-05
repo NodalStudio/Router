@@ -13,9 +13,10 @@ This repository contains the Traefik reverse proxy configuration for the create-
 
 | Route Path | Service | Container | Port | Priority | Description |
 |------------|---------|-----------|------|----------|-------------|
+| `/` | Frontend | `fresh-frontend` | 8000 | 1 | Main frontend application (catch-all) |
 | `/admin` | Backend (Strapi) | `strapi-backend` | 1337 | 10 | Strapi admin interface |
 | `/forum` | Forum (NodeBB) | `nodebb-forum` | 4567 | 5 | Forum application |
-| `/` | Frontend | `fresh-frontend` | 8000 | 1 | Main frontend application (catch-all) |
+
 
 ### Priority Explanation
 - Higher priority numbers are matched first
