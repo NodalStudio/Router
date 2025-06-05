@@ -14,13 +14,13 @@ This repository contains the Traefik reverse proxy configuration.
 | Client | Service | Container | Port | Description |
 |------------|---------|-----------|------|----------|-------------|
 | - | Traefik | `traefik` | 8000 | Traefik dashboard | 
-| Alumbra | Deno Fresh | `fresh-frontend` | 8001 | Frontend application |
-| Alumbra | Strapi | `strapi-backend` | 8002 | Strapi admin interface |
-| Alumbra | NodeBB | `nodebb-forum` | 8003 | Forum platform |
+| Alumbra | Deno Fresh | `alumbra-fresh-frontend` | 8001 | Frontend application |
+| Alumbra | Strapi | `alumbra-strapi-backend` | 8002 | Strapi admin interface |
+| Alumbra | NodeBB | `alumbra-nodebb-forum` | 8003 | Forum platform |
 
 ## Network Configuration
 
-All services use the external `web` network for Traefik routing. This network must be created before starting the services:
+All services that are externaly exposed use the external `web` network for Traefik routing. This network must be created before starting the services:
 
 ```bash
 docker network create web
