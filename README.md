@@ -11,52 +11,81 @@ This repository contains the Traefik reverse proxy configuration.
 
 ### Service Routes
 
-| Client | Service | Container | Port | Description |
-|------------|---------|-----------|------|----------|-------------|
-| - | Traefik | `traefik` | 8000 | Traefik dashboard | 
-| Alumbra | Deno Fresh | `alumbra-fresh-frontend` | 8001 | Frontend application |
-| Alumbra | Strapi | `alumbra-strapi-backend` | 8002 | Strapi admin interface |
-| Alumbra | NodeBB | `alumbra-nodebb-forum` | 8003 | Forum platform |
+| Client     | Service    | Container                | Port | Description            |
+|------------|------------|--------------------------|------|------------------------|
+| -          | Traefik    | `traefik`                | 8000 | Traefik dashboard      | 
+| Alumbra    | Deno Fresh | `alumbra-fresh-frontend` | 8001 | Frontend application   |
+| Alumbra    | Strapi     | `alumbra-strapi-backend` | 8002 | Strapi admin interface |
+| Alumbra    | NodeBB     | `alumbra-nodebb-forum`   | 8003 | Forum platform         |
 
-## Network Configuration
+## 🌐 Hybrid Configuration
 
-All services that are externaly exposed use the external `web` network for Traefik routing. This network must be created before starting the services:
+This router automatically handles:
+- **Development**: HTTP-only for `.localhost` domains  
+- **Production**: HTTPS with Let's Encrypt for real domains
 
-```bash
-docker network create web
+### Smart Domain Detection
+- **`.localhost` domains**: HTTP only, no SSL
+- **Real domains**: Automatic HTTPS with Let's Encrypt
+
+### Middleware Configuration
+The HTTPS redirect middleware is defined directly in `docker-compose.yml`:
+```yaml
+- "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+- "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
 ```
 
-This allows multiple docker-compose stacks to share the same network and communicate with Traefik.
+## 📁 Files Overview
 
-## Adding New Services
+- `docker-compose.yml` - Traefik container with middleware definitions
+- `traefik.yml` - Core Traefik configuration with Let's Encrypt
+- `acme.json` - Let's Encrypt certificate storage (auto-created)
 
-To add a new service to the router:
+## 🔗 Network Configuration
 
-1. Add labels to your service in `docker-compose.yml`:
+Services connect via the external `web` network, allowing multiple docker-compose stacks to share the same Traefik instance.
+
+## 🔧 Adding New Services
+
+To add a new service with hybrid HTTP/HTTPS support:
+
+### 1. Basic Service Labels
 ```yaml
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.your-service.rule=Host(`localhost`) && PathPrefix(`/your-path`)"
-  - "traefik.http.routers.your-service.service=your-service"
-  - "traefik.http.routers.your-service.priority=X"
+  # HTTP route (always available)
+  - "traefik.http.routers.your-service.rule=Host(`${YOUR_HOST}`)"
+  - "traefik.http.routers.your-service.entrypoints=web"
+  # HTTPS route (only for real domains)
+  - "traefik.http.routers.your-service-secure.rule=Host(`${YOUR_HOST}`) && !HostRegexp(`{host:.+\\.localhost}`)"
+  - "traefik.http.routers.your-service-secure.entrypoints=websecure"
+  - "traefik.http.routers.your-service-secure.tls=true"
+  - "traefik.http.routers.your-service-secure.tls.certresolver=letsencrypt"
+  # Conditional HTTPS redirect
+  - "traefik.http.routers.your-service.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-}"
   - "traefik.http.services.your-service.loadbalancer.server.port=YOUR_PORT"
   - "traefik.docker.network=web"
 ```
 
-2. Connect your service to the `web` network:
+### 2. Network Connection
 ```yaml
 networks:
   - web
-  - app-network  # your internal network if needed
+  - your-internal-network  # if needed
 ```
 
-3. Update this README with the new route mapping
+### 3. Environment Variables
+Add to your `.env` file:
+```bash
+YOUR_HOST=your-service.localhost  # dev
+# YOUR_HOST=your-service.yourdomain.com  # prod
+```
 
-## Adding New Docker Compose Stacks
+## 🚀 Adding New Projects
 
-To add a completely separate docker-compose stack that also uses Traefik routing:
+For completely separate projects using this router:
 
-1. In your new `docker-compose.yml`, reference the external web network:
+1. **Reference the external network:**
 ```yaml
 networks:
   web:
@@ -64,52 +93,44 @@ networks:
 
 services:
   your-service:
-    # ... your service configuration
+    # ... service config
     networks:
       - web
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.your-service.rule=Host(`localhost`) && PathPrefix(`/your-path`)"
-      # ... other Traefik labels
+      # ... use the hybrid labels pattern above
 ```
 
-2. The `web` network will already exist and your service will automatically be routed through the same Traefik instance
+2. **Set the HTTPS_REDIRECT_MIDDLEWARE environment variable:**
+```bash
+# Development
+HTTPS_REDIRECT_MIDDLEWARE=
 
-## SSL/TLS Configuration
+# Production  
+HTTPS_REDIRECT_MIDDLEWARE=https-redirect@docker
+```
 
-### Prerequisites
+## 🛠️ Troubleshooting
 
-1. **SSL Certificates Directory**: Each project must have its own `ssl-certs/` directory in the parent folder containing:
-   - `cert.crt` - SSL certificate
-   - `cert.key` - SSL private key
+### Development Issues
+- Ensure `HTTPS_REDIRECT_MIDDLEWARE` is empty for localhost
+- Use HTTP URLs only: `http://service.localhost`
+- Check: `docker logs traefik`
 
-### Local Setup
+### Production Issues
+- Verify domain DNS points to your server
+- Ensure port 80/443 are open to internet
+- Monitor Let's Encrypt: `docker logs traefik | grep acme`
+- Check `TRAEFIK_SSL_EMAIL` is set correctly
 
-1. **Install mkcert for local HTTPS certificates:**
-   ```bash
-   # macOS
-   brew install mkcert
-   
-   # Windows (with Chocolatey)
-   choco install mkcert
-   
-   # Install local CA in browser trust store
-   mkcert -install
-   ```
+### Common Commands
+```bash
+# Recreate containers (clears cached labels)
+docker-compose down && docker-compose up -d
 
-2. **Generate certificates in your project:**
-   ```bash
-   # From your project root (parent of router/)
-   mkdir ssl-certs
-   cd ssl-certs
-   mkcert localhost "*.localhost" admin.localhost forum.localhost traefik.localhost
-   mv localhost+4.pem cert.crt
-   mv localhost+4-key.pem cert.key
-   ```
+# View Traefik logs
+docker logs traefik
 
-### Production Setup
-
-Place your official SSL certificates from your provider in the `ssl-certs/` directory:
-- Certificate: `cert.crt` (your domain certificate)
-- Private key: `cert.key` (your domain private key)
+# Check certificate permissions
+ls -la acme.json  # should be 600
+```
 
