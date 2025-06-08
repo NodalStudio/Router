@@ -10,7 +10,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ../ssl-certs:/ssl-certs
+      - ./acme.json:/acme.json:rw
+    environment:
+      - TRAEFIK_SSL_EMAIL=${TRAEFIK_SSL_EMAIL}
     networks:
       - web
     labels:
@@ -22,7 +24,8 @@ services:
       - "traefik.http.routers.dashboard-secure.service=api@internal"
       - "traefik.http.routers.dashboard-secure.entrypoints=websecure"
       - "traefik.http.routers.dashboard-secure.tls=true"
-      - "traefik.http.routers.dashboard.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
       # - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD_HASH}"
 

@@ -5,11 +5,6 @@ api:
 entryPoints:
   web:
     address: ":80"
-    http:
-      redirections:
-        entrypoint:
-          to: websecure
-          scheme: https
   websecure:
     address: ":443"
 
@@ -21,8 +16,8 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: example@example.com
-      storage: /ssl-certs/acme.json
+      email: your-email@example.com
+      storage: /acme.json
       httpChallenge:
         entryPoint: web
 
@@ -34,16 +29,6 @@ log:
   level: INFO
 
 accessLog: {}
-
-tls:
-  options:
-    default:
-      minVersion: "VersionTLS12"
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /ssl-certs/cert.crt
-        keyFile: /ssl-certs/cert.key
 
 http:
   middlewares:
