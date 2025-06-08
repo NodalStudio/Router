@@ -5,6 +5,11 @@ api:
 entryPoints:
   web:
     address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
   websecure:
     address: ":443"
 
@@ -29,3 +34,20 @@ log:
   level: INFO
 
 accessLog: {}
+
+tls:
+  options:
+    default:
+      minVersion: "VersionTLS12"
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /ssl-certs/cert.crt
+        keyFile: /ssl-certs/cert.key
+
+http:
+  middlewares:
+    https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true

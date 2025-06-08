@@ -77,4 +77,39 @@ services:
 
 ## SSL/TLS Configuration
 
-The configuration includes Let's Encrypt integration for automatic SSL certificates in production. Update the email in `traefik.yml` for certificate notifications.
+### Prerequisites
+
+1. **SSL Certificates Directory**: Each project must have its own `ssl-certs/` directory in the parent folder containing:
+   - `cert.crt` - SSL certificate
+   - `cert.key` - SSL private key
+
+### Local Setup
+
+1. **Install mkcert for local HTTPS certificates:**
+   ```bash
+   # macOS
+   brew install mkcert
+   
+   # Windows (with Chocolatey)
+   choco install mkcert
+   
+   # Install local CA in browser trust store
+   mkcert -install
+   ```
+
+2. **Generate certificates in your project:**
+   ```bash
+   # From your project root (parent of router/)
+   mkdir ssl-certs
+   cd ssl-certs
+   mkcert localhost "*.localhost" admin.localhost forum.localhost traefik.localhost
+   mv localhost+4.pem cert.crt
+   mv localhost+4-key.pem cert.key
+   ```
+
+### Production Setup
+
+Place your official SSL certificates from your provider in the `ssl-certs/` directory:
+- Certificate: `cert.crt` (your domain certificate)
+- Private key: `cert.key` (your domain private key)
+
