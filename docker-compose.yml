@@ -33,6 +33,3 @@ services:
 networks:
   web:
     external: true
-
-volumes:
-  traefik-ssl-certs:
