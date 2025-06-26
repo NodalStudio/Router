@@ -31,5 +31,5 @@ services:
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD_HASH}"
 
 networks:
-  web:
+  shared:
     external: true
