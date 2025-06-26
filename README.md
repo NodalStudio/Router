@@ -13,10 +13,10 @@ This repository contains the Traefik reverse proxy configuration.
 
 | Client     | Service    | Container                | Port | Description            |
 |------------|------------|--------------------------|------|------------------------|
-| -          | Traefik    | `traefik`                | 8000 | Traefik dashboard      | 
-| Alumbra    | Deno Fresh | `alumbra-fresh-frontend` | 8001 | Frontend application   |
-| Alumbra    | Strapi     | `alumbra-strapi-backend` | 8002 | Strapi admin interface |
-| Alumbra    | NodeBB     | `alumbra-nodebb-forum`   | 8003 | Forum platform         |
+| -          | Traefik    | `traefik`                | 8000 | Traefik dashboard      |
+| -          | MySQL      | `mysql`                  | 8001 | Shared database        | 
+| Alumbra    | Deno Fresh | `alumbra-fresh-frontend` | 8002 | Frontend application   |
+| Alumbra    | Strapi     | `alumbra-strapi-backend` | 8003 | Strapi admin interface |
 
 ## 🌐 Hybrid Configuration
 
