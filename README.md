@@ -64,7 +64,7 @@ labels:
   # Conditional HTTPS redirect
   - "traefik.http.routers.your-service.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-}"
   - "traefik.http.services.your-service.loadbalancer.server.port=YOUR_PORT"
-  - "traefik.docker.network=web"
+  - "traefik.docker.network=shared"
 ```
 
 ### 2. Network Connection
@@ -88,14 +88,14 @@ For completely separate projects using this router:
 1. **Reference the external network:**
 ```yaml
 networks:
-  web:
+  shared:
     external: true
 
 services:
   your-service:
     # ... service config
     networks:
-      - web
+      - shared
     labels:
       # ... use the hybrid labels pattern above
 ```

@@ -14,7 +14,7 @@ services:
     environment:
       - TRAEFIK_SSL_EMAIL=${TRAEFIK_SSL_EMAIL}
     networks:
-      - web
+      - shared
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_HOST}`)"
@@ -27,8 +27,8 @@ services:
       - "traefik.http.routers.dashboard-secure.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD_HASH}"
+      # - "traefik.http.routers.dashboard.middlewares=auth"
+      # - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD_HASH}"
 
 networks:
   shared:

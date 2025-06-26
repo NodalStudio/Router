@@ -11,7 +11,7 @@ entryPoints:
 providers:
   docker:
     exposedByDefault: false
-    network: web
+    network: shared
 
 certificatesResolvers:
   letsencrypt:
